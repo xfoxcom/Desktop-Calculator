@@ -1,6 +1,7 @@
 package calculator;
 
 import javax.swing.*;
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,19 +34,29 @@ public class Calculator extends JFrame {
         Solve.setBounds(140, 280, 50, 40);
         add(Solve);
         Solve.addActionListener(e -> {
-            String text = EquationTextField.getText();
+            EquationTextField.setForeground(Color.BLACK.darker());
             List<String> exp = new ArrayList<>();
             String expression = EquationTextField.getText();
             Pattern pattern = Pattern.compile("([0-9.]+)([\u002B\u2212\u00F7\u00D7\\-])*");
             Matcher matcher = pattern.matcher(expression);
 
-            while (matcher.find()) {
-                if (matcher.group(1) != null) exp.add(matcher.group(1));
-                if (matcher.group(2) != null) exp.add(matcher.group(2));
-            }
+            Pattern divisionByZero = Pattern.compile("\u00F70");
+            Matcher divisionCheck = divisionByZero.matcher(expression);
 
-            EquationTextField.setText(text);
+            if (expression.charAt(expression.length() - 1) == '\u002B' | expression.endsWith("-") | expression.endsWith("\u00F7") | expression.endsWith("\u00D7")) {
+                EquationTextField.setForeground(Color.RED.darker());
+            } else if (divisionCheck.find()) {
+                EquationTextField.setForeground(Color.RED.darker());
+            } else {
+
+                while (matcher.find()) {
+                    if (matcher.group(1) != null) exp.add(matcher.group(1));
+                    if (matcher.group(2) != null) exp.add(matcher.group(2));
+                }
+
+                EquationTextField.setText(expression);
                 resultLabel.setText(String.valueOf(recursiveCalc(exp)));
+            }
         });
 
         JButton Add = new JButton("\u002B");
@@ -55,7 +66,17 @@ public class Calculator extends JFrame {
 
         Add.addActionListener(e -> {
             String text = EquationTextField.getText();
-            EquationTextField.setText(text + "\u002B");
+
+            if (text.length() != 0) {
+                if (text.charAt(text.length() - 1) == '\u002B' | text.endsWith("-") | text.endsWith("\u00F7") | text.endsWith("\u00D7")) {
+                    EquationTextField.setText(EquationTextField.getText().substring(0, EquationTextField.getText().length() - 1));
+                    EquationTextField.setText(EquationTextField.getText() + "\u002B");
+                } else if (text.endsWith(".")) {
+                    EquationTextField.setText(EquationTextField.getText() + "0\u002B");
+                } else if (text.startsWith(".")) {
+                    EquationTextField.setText(0 + EquationTextField.getText() + "\u002B");
+                } else EquationTextField.setText(EquationTextField.getText() + "\u002B");
+            }
         });
 
         JButton Subtract = new JButton("-"); //"\u2212"
@@ -64,8 +85,17 @@ public class Calculator extends JFrame {
         add(Subtract);
 
         Subtract.addActionListener(e -> {
-            EquationTextField.setText(EquationTextField.getText() + "-");
-        });
+            String text = EquationTextField.getText();
+            if (text.length() != 0) {
+                if (text.charAt(text.length() - 1) == '\u002B' | text.endsWith("-") | text.endsWith("\u00F7") | text.endsWith("\u00D7")) {
+                    EquationTextField.setText(EquationTextField.getText().substring(0, EquationTextField.getText().length() - 1));
+                    EquationTextField.setText(EquationTextField.getText() + "-");
+                } else if (text.endsWith(".")) {
+                    EquationTextField.setText(EquationTextField.getText() + "0-");
+                } else if (text.startsWith(".")) {
+                    EquationTextField.setText(0 + EquationTextField.getText() + "-");
+                } else EquationTextField.setText(EquationTextField.getText() + "-");
+        }});
 
         JButton Divide = new JButton("\u00F7");
         Divide.setName("Divide");
@@ -73,8 +103,17 @@ public class Calculator extends JFrame {
         add(Divide);
 
         Divide.addActionListener(e -> {
-            EquationTextField.setText(EquationTextField.getText() + "\u00F7");
-        });
+            String text = EquationTextField.getText();
+            if (text.length() != 0) {
+                if (text.charAt(text.length() - 1) == '\u002B' | text.endsWith("-") | text.endsWith("\u00F7") | text.endsWith("\u00D7")) {
+                    EquationTextField.setText(EquationTextField.getText().substring(0, EquationTextField.getText().length() - 1));
+                    EquationTextField.setText(EquationTextField.getText() + "\u00F7");
+                } else if (text.endsWith(".")) {
+                    EquationTextField.setText(EquationTextField.getText() + "0\u00F7");
+                } else if (text.startsWith(".")) {
+                    EquationTextField.setText(0 + EquationTextField.getText() + "\u00F7");
+                } else EquationTextField.setText(EquationTextField.getText() + "\u00F7");
+        }});
 
         JButton Multiply = new JButton("\u00D7");
         Multiply.setName("Multiply");
@@ -82,8 +121,17 @@ public class Calculator extends JFrame {
         add(Multiply);
 
         Multiply.addActionListener(e -> {
-            EquationTextField.setText(EquationTextField.getText() + "\u00D7");
-        });
+            String text = EquationTextField.getText();
+            if (text.length() != 0) {
+                if (text.charAt(text.length() - 1) == '\u002B' | text.endsWith("-") | text.endsWith("\u00F7") | text.endsWith("\u00D7")) {
+                    EquationTextField.setText(EquationTextField.getText().substring(0, EquationTextField.getText().length() - 1));
+                    EquationTextField.setText(EquationTextField.getText() + "\u00D7");
+                } else if (text.endsWith(".")) {
+                    EquationTextField.setText(EquationTextField.getText() + "0\u00D7");
+                } else if (text.startsWith(".")) {
+                    EquationTextField.setText(0 + EquationTextField.getText() + "\u00D7");
+                } else EquationTextField.setText(EquationTextField.getText() + "\u00D7");
+        }});
 
         JButton zero = new JButton("0");
         zero.setBounds(20, 280, 50, 40);
@@ -171,14 +219,22 @@ public class Calculator extends JFrame {
         point.setBounds(80, 280, 50, 40);
         point.setName("Dot");
         add(point);
-        point.addActionListener(e -> EquationTextField.setText(EquationTextField.getText() + "."));
+        point.addActionListener(e -> {
+            String text = EquationTextField.getText();
+        /*if (EquationTextField.getText().isEmpty()) {
+            EquationTextField.setText(EquationTextField.getText() + "0.");
+        } else*/
+
+            if (text.endsWith("\u002B") | text.endsWith("-") | text.endsWith("\u00F7") | text.endsWith("\u00D7")) {
+            EquationTextField.setText(EquationTextField.getText() + "0.");
+        } else EquationTextField.setText(EquationTextField.getText() + ".");
+        });
 
         JButton delete = new JButton("Del");
         delete.setBounds(20, 60, 70, 40);
         delete.setName("Delete");
         add(delete);
         delete.addActionListener(e -> {
-
             if (EquationTextField.getText().length() > 0)
             EquationTextField.setText(EquationTextField.getText().substring(0, EquationTextField.getText().length() - 1));
         });
@@ -261,7 +317,6 @@ public class Calculator extends JFrame {
         }
 
         public String recursiveCalc (List<String> exp) {
-
         String result;
             DecimalFormat df = new DecimalFormat("#.##");
 
@@ -279,8 +334,6 @@ public class Calculator extends JFrame {
                         break;
                     }
                 }
-                System.out.println(exp);
-
                 for (int i = 0; i < exp.size(); i++) {
                     double e = 0;
                     if (exp.get(i).equals("\u00D7")) {  // multi
@@ -291,10 +344,7 @@ public class Calculator extends JFrame {
                         break;
                     }
                 }
-                System.out.println(exp);
             } else {
-
-
                 for (int i = 0; i < exp.size(); i++) {
                     double e = 0;
                     if (exp.get(i).equals("-")) {  // sub
@@ -305,9 +355,6 @@ public class Calculator extends JFrame {
                         break;
                     }
                 }
-
-                System.out.println(exp);
-
                 for (int i = 0; i < exp.size(); i++) {
                     double e = 0;
                     if (exp.get(i).equals("\u002B")) {  // add
@@ -318,20 +365,20 @@ public class Calculator extends JFrame {
                         break;
                     }
                 }
-                System.out.println(exp);
-
-
-
             }
         if (exp.size() > 1) {
             recursiveCalc(exp);
         }
         if (Double.parseDouble(exp.get(0))%1 == 0) {
             int a = (int) Double.parseDouble(exp.get(0));
-            result = String.valueOf(df.format(a));
+            result = df.format(a);
         } else result = String.valueOf(df.format(Double.parseDouble(exp.get(0))));
-        return result; //exp.get(0);
+        return result;
         }
+        public boolean isValid (String text) {
 
-    }
+
+        return true;
+        }
+}
 
